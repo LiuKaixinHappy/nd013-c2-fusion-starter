@@ -82,18 +82,25 @@ def show_range_image(frame, lidar_name):
     img_range = ri_range.astype(np.uint8)
     # step 5 : map the intensity channel onto an 8-bit scale and normalize with the difference between the 1- and 99-percentile to mitigate the influence of outliers
     ri_intensity = ri[:, :, 1]
-    ri_intensity_8bit = np.clip(ri_intensity, 0, np.percentile(ri_intensity, 99))
-    ri_intensity_8bit = (ri_intensity_8bit - np.percentile(ri_intensity_8bit, 1)) / (
-                np.percentile(ri_intensity_8bit, 99) - np.percentile(ri_intensity_8bit, 1))
-    img_intensity = (ri_intensity_8bit * 255).astype(np.uint8)
+    ri_intensity = np.clip(ri_intensity, 0, np.percentile(ri_intensity, 99))
+    ri_intensity = ri_intensity * 255 / (np.amax(ri_intensity) - np.amin(ri_intensity))
+    img_intensity = ri_intensity.astype(np.uint8)
+
+    # [Kaixin]: This is my last submit, why it's not 8-bit scale?
+    # ri_intensity_8bit = np.clip(ri_intensity, 0, np.percentile(ri_intensity, 99))
+    # ri_intensity_8bit = (ri_intensity_8bit - np.percentile(ri_intensity_8bit, 1)) / (
+    #             np.percentile(ri_intensity_8bit, 99) - np.percentile(ri_intensity_8bit, 1))
+    # img_intensity = (ri_intensity_8bit * 255).astype(np.uint8)
+
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
     stacked_image = np.vstack((img_range, img_intensity))
     img_range_intensity = stacked_image.astype(np.uint8)
 
     # crop +/-90 degree around the forward-facing x-axis.
-    #     deg90 = int(img_range_intensity.shape[1] / 4)
-    #     ri_center = int(img_range_intensity.shape[1] / 2)
-    #     img_range_intensity = img_range_intensity[:,ri_center-deg90:ri_center+deg90]
+    deg90 = int(img_range_intensity.shape[1] / 4)
+    ri_center = int(img_range_intensity.shape[1] / 2)
+    img_range_intensity = img_range_intensity[:, ri_center - deg90:ri_center + deg90]
+
     #######
     ####### ID_S1_EX1 END #######
 
