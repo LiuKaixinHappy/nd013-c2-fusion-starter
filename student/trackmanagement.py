@@ -117,22 +117,26 @@ class Trackmanagement:
             if meas_list:  # if not empty
                 if meas_list[0].sensor.in_fov(track.x):
                     # your code goes here
-                    track.score -= 1. / params.window
+                    if meas_list[0].sensor.name == 'lidar':
+                        track.score -= 0.1
+        #           else:
+        #               # The score should only be decreased when an object is inside the FOV but not detected.
+        #               # [kaixin]: How to check detected or not? If I set the score decreased by 0.1, all tracks will be deleted.
+        #               track.score -= 0.01
 
         # delete old tracks
-        rm_track_ids = []
+        rm_tracks = []
         for i in range(len(self.track_list)):
             track = self.track_list[i]
             if track.state == 'confirmed':
                 if track.score < params.delete_threshold or track.P[0, 0] > params.max_P or track.P[
                     1, 1] > params.max_P:
-                    rm_track_ids.append(i)
+                    rm_tracks.append(track)
             else:
                 if track.score < 0.05 or track.P[0, 0] > params.max_P or track.P[1, 1] > params.max_P:
-                    rm_track_ids.append(i)
-        for idx in rm_track_ids:
-            track = self.track_list[i]
-            self.delete_track(track)
+                    rm_tracks.append(track)
+        for rm_track in rm_tracks:
+            self.delete_track(rm_track)
         ############
         # END student code
         ############
@@ -161,7 +165,7 @@ class Trackmanagement:
         # - increase track score
         # - set track state to 'tentative' or 'confirmed'
         ############
-        track.score += 1. / params.window
+        track.score += 0.1
         if track.score > params.confirmed_threshold:
             track.state = 'confirmed'
 
