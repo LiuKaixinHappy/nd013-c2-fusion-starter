@@ -128,7 +128,7 @@ class Trackmanagement:
                     1, 1] > params.max_P:
                     rm_tracks.append(track)
             else:
-                if track.score < 0.05 or track.P[0, 0] > params.max_P or track.P[1, 1] > params.max_P:
+                if track.score < 0 or track.P[0, 0] > params.max_P or track.P[1, 1] > params.max_P:
                     rm_tracks.append(track)
         for rm_track in rm_tracks:
             self.delete_track(rm_track)
