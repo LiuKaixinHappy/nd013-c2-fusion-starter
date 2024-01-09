@@ -55,8 +55,8 @@ class Association:
             track = track_list[i]
             for j in range(M):
                 meas = meas_list[j]
-                dist = self.MHD(track, meas, 1)
-                if self.gating(dist, meas.sensor.name):
+                dist = self.MHD(track, meas, KF)
+                if self.gating(dist, meas.sensor):
                     self.association_matrix[i, j] = dist
 
         ############
@@ -106,7 +106,8 @@ class Association:
         ############
 
         # check if measurement lies inside gate
-        limit = chi2.ppf(params.gating_threshold, df=2)
+
+        limit = chi2.ppf(params.gating_threshold, df=sensor.dim_meas)
         if MHD < limit:
             return True
         else:
@@ -121,12 +122,9 @@ class Association:
         # TODO Step 3: calculate and return Mahalanobis distance
         ############
         # calc Mahalanobis distance
-
         H = meas.sensor.get_H(track.x)
-        gamma = meas.z - H * track.x
-        S = H * track.P * H.transpose() + meas.R
-        MHD = gamma.transpose() * np.linalg.inv(S) * gamma  # Mahalanobis distance formula
-        return MHD
+        mhd = KF.gamma(track, meas).transpose() * np.linalg.inv(KF.S(track, meas, H)) * KF.gamma(track, meas)
+        return mhd
 
         ############
         # END student code

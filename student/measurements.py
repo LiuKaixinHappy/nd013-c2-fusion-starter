@@ -85,10 +85,10 @@ class Sensor:
             pos_veh = np.ones((4, 1))  # homogeneous coordinates
             pos_veh[0:3] = x[0:3]
             pos_sens = self.veh_to_sens * pos_veh
-            if pos_sens[0] == 0:
+            if pos_sens[0,0] == 0:
                 raise Exception('pos_sens[0] cannot be zero!')
-            hx = np.matrix([[self.c_i - self.f_i * pos_sens[1] / pos_sens[0]],
-                            [self.c_j - self.f_j * pos_sens[2] / pos_sens[0]]])
+            hx = np.matrix([[self.c_i - self.f_i * pos_sens[1, 0] / pos_sens[0, 0]],
+                            [self.c_j - self.f_j * pos_sens[2, 0] / pos_sens[0, 0]]])
             return hx
             ############
             # END student code

@@ -117,12 +117,7 @@ class Trackmanagement:
             if meas_list:  # if not empty
                 if meas_list[0].sensor.in_fov(track.x):
                     # your code goes here
-                    if meas_list[0].sensor.name == 'lidar':
-                        track.score -= 0.1
-        #           else:
-        #               # The score should only be decreased when an object is inside the FOV but not detected.
-        #               # [kaixin]: How to check detected or not? If I set the score decreased by 0.1, all tracks will be deleted.
-        #               track.score -= 0.01
+                    track.score -= 0.1
 
         # delete old tracks
         rm_tracks = []
@@ -168,6 +163,8 @@ class Trackmanagement:
         track.score += 0.1
         if track.score > params.confirmed_threshold:
             track.state = 'confirmed'
+        else:
+            track.state = 'tentative'
 
         ############
         # END student code
